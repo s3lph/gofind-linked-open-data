@@ -2,6 +2,7 @@ import os
 import sys
 import hashlib
 import pickle
+import time
 
 import urllib.request
 import lxml.html
@@ -10,6 +11,7 @@ from untitled_project.types.document import Document
 from untitled_project.types.image import Image
 from untitled_project.types.place import Place
 from untitled_project.database.facade import DatabaseFacade
+from untitled_project.sources.wikidata import WikidataSource
 
 BASEURL = 'http://www.basler-bauten.ch'
 INDEX = '/'
@@ -35,6 +37,41 @@ def __load_obj(fname):
     with open(fname, 'rb') as f:
         name, url, body = pickle.load(f)
     return name, url, body
+
+
+def __levenshtein(a, b):
+    la = len(a)
+    lb = len(b)
+    dp = [[0 for j in range(lb+1)] for i in range(la+1)]
+    for ia in range(la+1):
+        dp[ia][0] = ia
+    for ib in range(lb+1):
+        dp[0][ib] = ib
+    for ia in range(la):
+        for ib in range(lb):
+            cost = 1 if a[ia] != b[ib] else 0
+            dp[ia+1][ib+1] = min(
+                dp[ia][ib+1] + 1,   # deletion
+                dp[ia+1][ib] + 1,   # inserion
+                dp[ia][ib] + cost,  # substitution
+            )
+    return dp[la][lb] / (max(la, lb) + 1)
+
+
+def __find_best_wikidata(name, results, threshold=0.1):
+    minresult, mindist = None, float('inf')
+    for result in results:
+        rwikidata_id, labels = result
+        rmindist = float('inf')
+        for label in labels:
+            if label is None or len(label) == 0:
+                continue
+            dist = __levenshtein(name.lower(), label.lower())
+            rmindist = min(rmindist, dist)
+        if rmindist < mindist:
+            mindist = rmindist
+            minresult = rwikidata_id
+    return (minresult, mindist) if mindist < threshold else None
 
 
 def cat_list():
@@ -66,7 +103,6 @@ def obj_list(cat_url):
 def obj_dump(obj_name, obj_url):
     body, content_type = __request(obj_url)
     digest = hashlib.sha256(body).hexdigest()
-    print(f'Dumping {obj_url} to {digest}')
     with open(os.path.join(RAW_OUT_DIR, digest), 'wb') as f:
         pickle.dump((obj_name, obj_url, body), f)
 
@@ -88,8 +124,18 @@ def obj_parse(fname):
     except IndexError:
         title = None
 
+    wikidata_id = None
+    if lat is not None and lon is not None:
+        wikidata = WikidataSource()
+        time.sleep(1)
+        results = wikidata.query_name((lat, lon), radius=1, limit=30)
+        best = __find_best_wikidata(name, results, threshold=0.1)
+        if best is not None:
+            wikidata_id, dist = best
+            print(name, wikidata_id, dist)
+
     # Abuse title as place name; may be helpful for fuzzy matching
-    return Place(None, title, lat, lon, None)
+    return Place(None, title, lat, lon, wikidata_id)
 
 
 def obj_parse_doc(fname):
@@ -105,6 +151,7 @@ def obj_parse_doc(fname):
         author = None
 
     text = ' '.join([t.strip() for t in tree.xpath('//section[contains(@class, "article-content")]//p/text()')])
+
     return Document(None, title, author, None, text, BASEURL + url)
 
 
@@ -159,7 +206,7 @@ def parse():
             continue
         document = obj_parse_doc(fullname)
         # images = obj_parse_images(fullname)
-        place.id = db.insert_place(place, upsert_fields=['p_title', 'p_lat', 'p_lon'])
+        place.id = db.insert_place(place, upsert_fields=['p_title', 'p_lat', 'p_lon', 'p_wikidata'])
         document.id = db.insert_document(document, upsert_fields=['d_title', 'd_author', 'd_text', 'd_source'])
         db.link_place_document(place, document, 0)
         # for image in images:

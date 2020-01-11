@@ -6,8 +6,8 @@ import dataclasses
 @dataclasses.dataclass
 class Image:
     id: Optional[int]
-    file: str
-    mime: str
-    caption: str
-    copy: str
-    source: str
+    file: Optional[str]
+    mime: Optional[str]
+    caption: Optional[str]
+    author: Optional[str]
+    source: Optional[str]

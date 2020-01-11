@@ -1,0 +1,860 @@
+openapi: 3.0.0
+info:
+  title: UntitledAPI
+  version: "0.1"
+servers:
+- url: /
+paths:
+  /ping:
+    get:
+      operationId: ping_get
+      parameters: []
+      responses:
+        "204":
+          description: Pong
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /places/search/location:
+    get:
+      operationId: places_search_location_get
+      parameters:
+      - name: latitude
+        in: query
+        description: Latitudinal part of the geographical location to find places
+          for, WGS-84.
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: number
+      - name: longitude
+        in: query
+        description: Longitudinal part of the geographical location to find places
+          for, WGS-84.
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: number
+      - name: radius
+        in: query
+        description: Search radius around the geographical location to find places
+          for, kilometers.
+        required: false
+        style: form
+        explode: true
+        schema:
+          minimum: 0
+          type: number
+          default: 1
+      - name: limit
+        in: query
+        description: Upper limit for the number of places to return.  Use 0 for unlimited.
+        required: false
+        style: form
+        explode: true
+        schema:
+          minimum: 0
+          type: integer
+          default: 10
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfPlaces'
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /places/search/name:
+    get:
+      operationId: places_search_name_get
+      parameters:
+      - name: name
+        in: query
+        description: Name to search for, case-insensitive.
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfPlaces'
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /place:
+    put:
+      summary: Add a new place
+      operationId: place_put
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Place'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Place'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - TokenAuth: []
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /place/{id}:
+    get:
+      summary: Fetch the place identified by the ID in the path.
+      operationId: place_id_get
+      parameters:
+      - name: id
+        in: path
+        description: ID number of the place to fetch.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Place'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+    delete:
+      summary: Delete the place identified by the ID in the path.
+      operationId: place_id_delete
+      parameters:
+      - name: id
+        in: path
+        description: ID number of the place to delete.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "204":
+          description: Success
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - TokenAuth: []
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+    patch:
+      summary: Update the place identified by the ID in the path.
+      operationId: place_id_patch
+      parameters:
+      - name: id
+        in: path
+        description: ID number of the place to update.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Place'
+        required: true
+      responses:
+        "204":
+          description: Success
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - TokenAuth: []
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /place/{id}/documents:
+    get:
+      summary: Find documents related to the place indicated by the ID in the path.
+      operationId: place_id_documents_get
+      parameters:
+      - name: id
+        in: path
+        description: ID number of the place to query for.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfDocuments'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /place/{pid}/document/{did}:
+    get:
+      summary: Get the links between a place identified by pid and a document indicated
+        by did.
+      operationId: place_pid_document_did_get
+      parameters:
+      - name: pid
+        in: path
+        description: ID number of the place
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      - name: did
+        in: path
+        description: ID number of the document
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfIntegers'
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+    put:
+      summary: Add a link between a place identified by pid and a document indicated
+        by did.
+      operationId: place_pid_document_did_put
+      parameters:
+      - name: pid
+        in: path
+        description: ID number of the place
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      - name: did
+        in: path
+        description: ID number of the document
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      - name: position_in_text
+        in: query
+        description: Position of the reference to a place in the document text.
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        "204":
+          description: Success
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - TokenAuth: []
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+    delete:
+      summary: Delete a link between a place identified by pid and a document indicated
+        by did.
+      operationId: place_pid_document_did_delete
+      parameters:
+      - name: pid
+        in: path
+        description: ID number of the place
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      - name: did
+        in: path
+        description: ID number of the document
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      - name: position_in_text
+        in: query
+        description: Position of the reference to a place in the document text.
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        "204":
+          description: Success
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - TokenAuth: []
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /place/{id}/images:
+    get:
+      summary: Find images related to the place indicated by the ID in the path.
+      operationId: place_id_images_get
+      parameters:
+      - name: id
+        in: path
+        description: ID number of the place to query for.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfImages'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /place/{pid}/image/{iid}:
+    get:
+      summary: Get the link between a place identified by pid and an image indicated
+        by iid.
+      operationId: place_pid_image_iid_get
+      parameters:
+      - name: pid
+        in: path
+        description: ID number of the place
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      - name: iid
+        in: path
+        description: ID number of the image
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "204":
+          description: OK
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+    put:
+      summary: Add a link between a place identified by pid and an image indicated
+        by iid.
+      operationId: place_pid_image_iid_put
+      parameters:
+      - name: pid
+        in: path
+        description: ID number of the place
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      - name: iid
+        in: path
+        description: ID number of the image
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "204":
+          description: Success
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - TokenAuth: []
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+    delete:
+      summary: Delete a link between a place identified by pid and an image indicated
+        by iid.
+      operationId: place_pid_image_iid_delete
+      parameters:
+      - name: pid
+        in: path
+        description: ID number of the place
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      - name: iid
+        in: path
+        description: ID number of the image
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "204":
+          description: Success
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - TokenAuth: []
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /document:
+    put:
+      summary: Add a new document
+      operationId: document_put
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Document'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - TokenAuth: []
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /document/{id}:
+    get:
+      summary: Fetch the document identified by the ID in the path.
+      operationId: document_id_get
+      parameters:
+      - name: id
+        in: path
+        description: ID number of the document to fetch.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+    delete:
+      summary: Delete the document identified by the ID in the path.
+      operationId: document_id_delete
+      parameters:
+      - name: id
+        in: path
+        description: ID number of the document to delete.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "204":
+          description: Success
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - TokenAuth: []
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+    patch:
+      summary: Update the document identified by the ID in the path.
+      operationId: document_id_patch
+      parameters:
+      - name: id
+        in: path
+        description: ID number of the document to update.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Document'
+        required: true
+      responses:
+        "204":
+          description: Success
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - TokenAuth: []
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /image:
+    put:
+      summary: Add a new image
+      operationId: image_put
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Image'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Image'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - TokenAuth: []
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+  /image/{id}:
+    get:
+      summary: Fetch the image identified by the ID in the path.
+      operationId: image_id_get
+      parameters:
+      - name: id
+        in: path
+        description: ID number of the image to fetch.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Image'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+    delete:
+      summary: Delete the image identified by the ID in the path.
+      operationId: image_id_delete
+      parameters:
+      - name: id
+        in: path
+        description: ID number of the image to delete.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "204":
+          description: Success
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - TokenAuth: []
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+    patch:
+      summary: Update the image identified by the ID in the path.
+      operationId: image_id_patch
+      parameters:
+      - name: id
+        in: path
+        description: ID number of the image to update.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Image'
+        required: true
+      responses:
+        "204":
+          description: Success
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+      - TokenAuth: []
+      x-openapi-router-controller: swagger_server.controllers.default_controller
+components:
+  schemas:
+    Error:
+      required:
+      - code
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        debug:
+          type: string
+    Place:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+      example:
+        latitude: 6.027456183070403
+        name: name
+        id: 0
+        longitude: 1.4658129805029452
+    Document:
+      type: object
+      properties:
+        id:
+          type: integer
+        text:
+          type: string
+        title:
+          type: string
+        year:
+          type: integer
+        author:
+          type: string
+      example:
+        year: 6
+        author: author
+        id: 0
+        text: text
+        title: title
+    Image:
+      type: object
+      properties:
+        id:
+          type: integer
+        data:
+          type: string
+          format: base64
+        url:
+          type: string
+        mime:
+          type: string
+        caption:
+          type: string
+        copy:
+          type: string
+      example:
+        data: data
+        mime: mime
+        caption: caption
+        id: 0
+        copy: copy
+        url: url
+    ArrayOfPlaces:
+      type: array
+      items:
+        $ref: '#/components/schemas/Place'
+    ArrayOfDocuments:
+      type: array
+      items:
+        $ref: '#/components/schemas/Document'
+    ArrayOfImages:
+      type: array
+      items:
+        $ref: '#/components/schemas/Image'
+    ArrayOfIntegers:
+      type: array
+      items:
+        type: integer
+  securitySchemes:
+    TokenAuth:
+      type: http
+      scheme: bearer
+      x-bearerInfoFunc: swagger_server.controllers.authorization_controller.check_TokenAuth
+

@@ -2,6 +2,7 @@
 
 import urllib.request
 import lxml.html
+import json
 
 BASEURL = 'https://www.stadtgeschichtebasel.ch'
 INDEX = '/index.html'
@@ -23,7 +24,13 @@ for a in alist:
     response = urllib.request.urlopen(BASEURL + href)
     tree = lxml.html.fromstring(response.read())
     text = ' '.join(tree.xpath('//div[contains(@class, "texts")]//text()'))
-    articles.append((href, title, histyear, text))
+    articles.append({
+        'href': href,
+        'title': title,
+        'hist_year': histyear,
+        'text': text
+    })
 
-print(articles)
+with open('articles.json', 'w') as f:
+    f.write(json.dumps(articles))
 

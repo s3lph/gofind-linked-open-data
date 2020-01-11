@@ -1,0 +1,798 @@
+---
+openapi: "3.0.0"
+info:
+  version: "0.1"
+  title: UntitledAPI
+paths:
+
+
+  /ping:
+    get:
+      parameters: []
+      responses:
+        "204":
+          description: Pong
+
+
+  /places/search/location:
+    get:
+      parameters:
+        - name: latitude
+          in: query
+          description: Latitudinal part of the geographical location to find places for, WGS-84.
+          required: true
+          schema:
+            type: number
+        - name: longitude
+          in: query
+          description: Longitudinal part of the geographical location to find places for, WGS-84.
+          required: true
+          schema:
+            type: number
+        - name: radius
+          in: query
+          description: Search radius around the geographical location to find places for, kilometers.
+          required: false
+          schema:
+            type: number
+            minimum: 0
+            default: 1
+        - name: limit
+          in: query
+          description: Upper limit for the number of places to return.  Use 0 for unlimited.
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 10
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArrayOfPlaces"
+
+
+  /places/search/name:
+    get:
+      parameters:
+        - name: name
+          in: query
+          description: Name to search for, case-insensitive.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArrayOfPlaces"
+
+
+  /place:
+    put:
+      summary: Add a new place
+      security:
+        - TokenAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Place"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Place"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
+  /place/{id}:
+    get:
+      summary: Fetch the place identified by the ID in the path.
+      parameters:
+        - name: id
+          in: path
+          description: ID number of the place to fetch.
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Place"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    patch:
+      summary: Update the place identified by the ID in the path.
+      security:
+        - TokenAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID number of the place to update.
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Place"
+      responses:
+        "204":
+          description: Success
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    delete:
+      summary: Delete the place identified by the ID in the path.
+      security:
+        - TokenAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID number of the place to delete.
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Success
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
+  /place/{id}/documents:
+    get:
+      summary: Find documents related to the place indicated by the ID in the path.
+      parameters:
+        - name: id
+          in: path
+          description: ID number of the place to query for.
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArrayOfDocuments"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /place/{pid}/document/{did}:
+    get:
+      summary: Get the links between a place identified by pid and a document indicated by did.
+      parameters:
+        - name: pid
+          in: path
+          description: ID number of the place
+          required: true
+          schema:
+            type: integer
+        - name: did
+          in: path
+          description: ID number of the document
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArrayOfIntegers"
+    put:
+      summary: Add a link between a place identified by pid and a document indicated by did.
+      security:
+        - TokenAuth: []
+      parameters:
+        - name: pid
+          in: path
+          description: ID number of the place
+          required: true
+          schema:
+            type: integer
+        - name: did
+          in: path
+          description: ID number of the document
+          required: true
+          schema:
+            type: integer
+        - name: position_in_text
+          in: query
+          description: Position of the reference to a place in the document text.
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Success
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Delete a link between a place identified by pid and a document indicated by did.
+      security:
+        - TokenAuth: []
+      parameters:
+        - name: pid
+          in: path
+          description: ID number of the place
+          required: true
+          schema:
+            type: integer
+        - name: did
+          in: path
+          description: ID number of the document
+          required: true
+          schema:
+            type: integer
+        - name: position_in_text
+          in: query
+          description: Position of the reference to a place in the document text.
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Success
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
+
+  /place/{id}/images:
+    get:
+      summary: Find images related to the place indicated by the ID in the path.
+      parameters:
+        - name: id
+          in: path
+          description: ID number of the place to query for.
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ArrayOfImages"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
+  /place/{pid}/image/{iid}:
+    get:
+      summary: Get the link between a place identified by pid and an image indicated by iid.
+      parameters:
+        - name: pid
+          in: path
+          description: ID number of the place
+          required: true
+          schema:
+            type: integer
+        - name: iid
+          in: path
+          description: ID number of the image
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: OK
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      summary: Add a link between a place identified by pid and an image indicated by iid.
+      security:
+        - TokenAuth: []
+      parameters:
+        - name: pid
+          in: path
+          description: ID number of the place
+          required: true
+          schema:
+            type: integer
+        - name: iid
+          in: path
+          description: ID number of the image
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Success
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Delete a link between a place identified by pid and an image indicated by iid.
+      security:
+        - TokenAuth: []
+      parameters:
+        - name: pid
+          in: path
+          description: ID number of the place
+          required: true
+          schema:
+            type: integer
+        - name: iid
+          in: path
+          description: ID number of the image
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Success
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
+
+  /document:
+    put:
+      summary: Add a new document
+      security:
+        - TokenAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Document"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
+
+  /document/{id}:
+    get:
+      summary: Fetch the document identified by the ID in the path.
+      parameters:
+        - name: id
+          in: path
+          description: ID number of the document to fetch.
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    patch:
+      summary: Update the document identified by the ID in the path.
+      security:
+        - TokenAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID number of the document to update.
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Document"
+      responses:
+        "204":
+          description: Success
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    delete:
+      summary: Delete the document identified by the ID in the path.
+      security:
+        - TokenAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID number of the document to delete.
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Success
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
+
+  /image:
+    put:
+      summary: Add a new image
+      security:
+        - TokenAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Image"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Image"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
+
+  /image/{id}:
+    get:
+      summary: Fetch the image identified by the ID in the path.
+      parameters:
+        - name: id
+          in: path
+          description: ID number of the image to fetch.
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Image"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    patch:
+      summary: Update the image identified by the ID in the path.
+      security:
+        - TokenAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID number of the image to update.
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Image"
+      responses:
+        "204":
+          description: Success
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+    delete:
+      summary: Delete the image identified by the ID in the path.
+      security:
+        - TokenAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID number of the image to delete.
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Success
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+/image/{id}/image:
+    get:
+      summary: Fetch the image file belonging to the image object identified by the ID in the path.
+      parameters:
+        - name: id
+          in: path
+          description: ID number of the image to fetch.
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            image/*:
+              schema:
+                type: string
+                format: binary
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
+
+components:
+
+  schemas:
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        debug:
+          type: string
+      required:
+        - code
+
+    Place:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+
+    Document:
+      type: object
+      properties:
+        id:
+          type: integer
+        text:
+          type: string
+        title:
+          type: string
+        year:
+          type: integer
+        author:
+          type: string
+
+    Image:
+      type: object
+      properties:
+        id:
+          type: integer
+        data:
+          type: string
+          format: base64
+        url:
+          type: string
+        mime:
+          type: string
+        caption:
+          type: string
+        copy:
+          type: string
+
+    ArrayOfPlaces:
+      type: array
+      items:
+        $ref: "#/components/schemas/Place"
+
+    ArrayOfDocuments:
+      type: array
+      items:
+        $ref: "#/components/schemas/Document"
+
+    ArrayOfImages:
+      type: array
+      items:
+        $ref: "#/components/schemas/Image"
+
+    ArrayOfIntegers:
+      type: array
+      items:
+        type: integer
+
+  securitySchemes:
+    TokenAuth:
+      type: http
+      scheme: bearer

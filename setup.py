@@ -19,7 +19,9 @@ setup(
     install_requires=[
         'bottle',
         'mysql-connector-python',
-        'lxml'
+        'lxml',
+        'six',
+        'connexion'
     ],
     entry_points={
         'console_scripts': [

@@ -29,7 +29,7 @@ class SchemaV1(BaseSchema):
                 d_text TEXT NOT NULL,
                 d_author VARCHAR(300) DEFAULT NULL,
                 d_year INTEGER DEFAULT NULL,
-                d_source VARCHAR(512) UNIQUE NOT NULL 
+                d_source VARCHAR(512) DEFAULT NULL 
             ) CHARACTER SET utf8mb4;
             """, """
             CREATE TABLE documents_places (
@@ -45,13 +45,23 @@ class SchemaV1(BaseSchema):
             """, """
             CREATE TABLE images (
                 i_id INTEGER(8) PRIMARY KEY AUTO_INCREMENT,
-                p_id INTEGER(8) DEFAULT NULL,
                 i_filepath VARCHAR(512) NOT NULL,
+                i_mime VARCHAR(512) NOT NULL,
                 i_author VARCHAR(300) DEFAULT NULL,
-                i_year INTEGER DEFAULT NULL,
+                i_caption VARCHAR(512) DEFAULT NULL,
                 i_source VARCHAR(512) DEFAULT NULL,
                 FOREIGN KEY (p_id) REFERENCES places(p_id)
                     ON UPDATE CASCADE ON DELETE SET NULL 
             );
+            """, """
+            CREATE TABLE images_places (
+                i_id INTEGER(8) NOT NULL,
+                p_id INTEGER(8) NOT NULL,
+                PRIMARY KEY (i_id, p_id),
+                FOREIGN KEY (i_id) REFERENCES images(i_id)
+                    ON UPDATE CASCADE ON DELETE CASCADE,
+                FOREIGN KEY (p_id) REFERENCES places(p_id)
+                    ON UPDATE CASCADE ON DELETE CASCADE
+            ) CHARACTER SET utf8mb4;
             """
         ]
