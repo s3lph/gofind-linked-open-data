@@ -4,17 +4,33 @@ info:
   version: "0.1"
 servers:
 - url: /
+tags:
+- name: Server
+  description: Server-related API paths
+- name: Places
+  description: API paths related to place objects
+- name: Documents
+  description: API paths related to document objects
+- name: Images
+  description: API paths related to image objects
+- name: Links
+- name: Search
+  description: API paths related to the search of objects
 paths:
   /ping:
     get:
+      tags:
+      - Server
       operationId: ping_get
       parameters: []
       responses:
         "204":
           description: Pong
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: untitled_project.server.controllers.server_controller
   /places/search/location:
     get:
+      tags:
+      - Search
       operationId: places_search_location_get
       parameters:
       - name: latitude
@@ -63,9 +79,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ArrayOfPlaces'
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: untitled_project.server.controllers.search_controller
   /places/search/name:
     get:
+      tags:
+      - Search
       operationId: places_search_name_get
       parameters:
       - name: name
@@ -83,9 +101,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ArrayOfPlaces'
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: untitled_project.server.controllers.search_controller
   /place:
     put:
+      tags:
+      - Places
       summary: Add a new place
       operationId: place_put
       requestBody:
@@ -115,9 +135,11 @@ paths:
                 $ref: '#/components/schemas/Error'
       security:
       - TokenAuth: []
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: untitled_project.server.controllers.places_controller
   /place/{id}:
     get:
+      tags:
+      - Places
       summary: Fetch the place identified by the ID in the path.
       operationId: place_id_get
       parameters:
@@ -142,8 +164,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: untitled_project.server.controllers.places_controller
     delete:
+      tags:
+      - Places
       summary: Delete the place identified by the ID in the path.
       operationId: place_id_delete
       parameters:
@@ -172,8 +196,10 @@ paths:
                 $ref: '#/components/schemas/Error'
       security:
       - TokenAuth: []
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: untitled_project.server.controllers.places_controller
     patch:
+      tags:
+      - Places
       summary: Update the place identified by the ID in the path.
       operationId: place_id_patch
       parameters:
@@ -214,9 +240,11 @@ paths:
                 $ref: '#/components/schemas/Error'
       security:
       - TokenAuth: []
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: untitled_project.server.controllers.places_controller
   /place/{id}/documents:
     get:
+      tags:
+      - Links
       summary: Find documents related to the place indicated by the ID in the path.
       operationId: place_id_documents_get
       parameters:
@@ -241,9 +269,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: untitled_project.server.controllers.links_controller
   /place/{pid}/document/{did}:
     get:
+      tags:
+      - Links
       summary: Get the links between a place identified by pid and a document indicated
         by did.
       operationId: place_pid_document_did_get
@@ -271,8 +301,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ArrayOfIntegers'
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: untitled_project.server.controllers.links_controller
     put:
+      tags:
+      - Links
       summary: Add a link between a place identified by pid and a document indicated
         by did.
       operationId: place_pid_document_did_put
@@ -318,8 +350,10 @@ paths:
                 $ref: '#/components/schemas/Error'
       security:
       - TokenAuth: []
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: untitled_project.server.controllers.links_controller
     delete:
+      tags:
+      - Links
       summary: Delete a link between a place identified by pid and a document indicated
         by did.
       operationId: place_pid_document_did_delete
@@ -365,9 +399,11 @@ paths:
                 $ref: '#/components/schemas/Error'
       security:
       - TokenAuth: []
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: untitled_project.server.controllers.links_controller
   /place/{id}/images:
     get:
+      tags:
+      - Links
       summary: Find images related to the place indicated by the ID in the path.
       operationId: place_id_images_get
       parameters:
@@ -392,9 +428,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: untitled_project.server.controllers.links_controller
   /place/{pid}/image/{iid}:
     get:
+      tags:
+      - Links
       summary: Get the link between a place identified by pid and an image indicated
         by iid.
       operationId: place_pid_image_iid_get
@@ -424,8 +462,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: untitled_project.server.controllers.links_controller
     put:
+      tags:
+      - Links
       summary: Add a link between a place identified by pid and an image indicated
         by iid.
       operationId: place_pid_image_iid_put
@@ -463,8 +503,10 @@ paths:
                 $ref: '#/components/schemas/Error'
       security:
       - TokenAuth: []
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: untitled_project.server.controllers.links_controller
     delete:
+      tags:
+      - Links
       summary: Delete a link between a place identified by pid and an image indicated
         by iid.
       operationId: place_pid_image_iid_delete
@@ -502,9 +544,11 @@ paths:
                 $ref: '#/components/schemas/Error'
       security:
       - TokenAuth: []
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: untitled_project.server.controllers.links_controller
   /document:
     put:
+      tags:
+      - Documents
       summary: Add a new document
       operationId: document_put
       requestBody:
@@ -534,9 +578,11 @@ paths:
                 $ref: '#/components/schemas/Error'
       security:
       - TokenAuth: []
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: untitled_project.server.controllers.documents_controller
   /document/{id}:
     get:
+      tags:
+      - Documents
       summary: Fetch the document identified by the ID in the path.
       operationId: document_id_get
       parameters:
@@ -561,8 +607,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: untitled_project.server.controllers.documents_controller
     delete:
+      tags:
+      - Documents
       summary: Delete the document identified by the ID in the path.
       operationId: document_id_delete
       parameters:
@@ -591,8 +639,10 @@ paths:
                 $ref: '#/components/schemas/Error'
       security:
       - TokenAuth: []
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: untitled_project.server.controllers.documents_controller
     patch:
+      tags:
+      - Documents
       summary: Update the document identified by the ID in the path.
       operationId: document_id_patch
       parameters:
@@ -633,9 +683,11 @@ paths:
                 $ref: '#/components/schemas/Error'
       security:
       - TokenAuth: []
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: untitled_project.server.controllers.documents_controller
   /image:
     put:
+      tags:
+      - Images
       summary: Add a new image
       operationId: image_put
       requestBody:
@@ -665,9 +717,11 @@ paths:
                 $ref: '#/components/schemas/Error'
       security:
       - TokenAuth: []
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: untitled_project.server.controllers.images_controller
   /image/{id}:
     get:
+      tags:
+      - Images
       summary: Fetch the image identified by the ID in the path.
       operationId: image_id_get
       parameters:
@@ -692,8 +746,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: untitled_project.server.controllers.images_controller
     delete:
+      tags:
+      - Images
       summary: Delete the image identified by the ID in the path.
       operationId: image_id_delete
       parameters:
@@ -722,8 +778,10 @@ paths:
                 $ref: '#/components/schemas/Error'
       security:
       - TokenAuth: []
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: untitled_project.server.controllers.images_controller
     patch:
+      tags:
+      - Images
       summary: Update the image identified by the ID in the path.
       operationId: image_id_patch
       parameters:
@@ -764,7 +822,39 @@ paths:
                 $ref: '#/components/schemas/Error'
       security:
       - TokenAuth: []
-      x-openapi-router-controller: swagger_server.controllers.default_controller
+      x-openapi-router-controller: untitled_project.server.controllers.images_controller
+  /image/{id}/image:
+    get:
+      tags:
+      - Images
+      summary: Fetch the image file belonging to the image object identified by the
+        ID in the path.
+      operationId: image_id_image_get
+      parameters:
+      - name: id
+        in: path
+        description: ID number of the image to fetch.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            image/*:
+              schema:
+                type: string
+                format: binary
+                x-content-type: image/*
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: untitled_project.server.controllers.images_controller
 components:
   schemas:
     Error:
@@ -789,9 +879,12 @@ components:
           type: number
         longitude:
           type: number
+        wikidata_id:
+          type: string
       example:
         latitude: 6.027456183070403
         name: name
+        wikidata_id: wikidata_id
         id: 0
         longitude: 1.4658129805029452
     Document:
@@ -807,11 +900,14 @@ components:
           type: integer
         author:
           type: string
+        source:
+          type: string
       example:
         year: 6
         author: author
         id: 0
         text: text
+        source: source
         title: title
     Image:
       type: object
@@ -827,14 +923,17 @@ components:
           type: string
         caption:
           type: string
-        copy:
+        author:
+          type: string
+        source:
           type: string
       example:
         data: data
+        author: author
         mime: mime
         caption: caption
         id: 0
-        copy: copy
+        source: source
         url: url
     ArrayOfPlaces:
       type: array
@@ -856,5 +955,5 @@ components:
     TokenAuth:
       type: http
       scheme: bearer
-      x-bearerInfoFunc: swagger_server.controllers.authorization_controller.check_TokenAuth
+      x-bearerInfoFunc: untitled_project.server.controllers.authorization_controller.check_TokenAuth
 

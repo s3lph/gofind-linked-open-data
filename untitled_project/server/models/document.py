@@ -14,7 +14,7 @@ class Document(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: int=None, text: str=None, title: str=None, year: int=None, author: str=None):  # noqa: E501
+    def __init__(self, id: int=None, text: str=None, title: str=None, year: int=None, author: str=None, source: str=None):  # noqa: E501
         """Document - a model defined in Swagger
 
         :param id: The id of this Document.  # noqa: E501
@@ -27,13 +27,16 @@ class Document(Model):
         :type year: int
         :param author: The author of this Document.  # noqa: E501
         :type author: str
+        :param source: The source of this Document.  # noqa: E501
+        :type source: str
         """
         self.swagger_types = {
             'id': int,
             'text': str,
             'title': str,
             'year': int,
-            'author': str
+            'author': str,
+            'source': str
         }
 
         self.attribute_map = {
@@ -41,13 +44,15 @@ class Document(Model):
             'text': 'text',
             'title': 'title',
             'year': 'year',
-            'author': 'author'
+            'author': 'author',
+            'source': 'source'
         }
         self._id = id
         self._text = text
         self._title = title
         self._year = year
         self._author = author
+        self._source = source
 
     @classmethod
     def from_dict(cls, dikt) -> 'Document':
@@ -164,3 +169,24 @@ class Document(Model):
         """
 
         self._author = author
+
+    @property
+    def source(self) -> str:
+        """Gets the source of this Document.
+
+
+        :return: The source of this Document.
+        :rtype: str
+        """
+        return self._source
+
+    @source.setter
+    def source(self, source: str):
+        """Sets the source of this Document.
+
+
+        :param source: The source of this Document.
+        :type source: str
+        """
+
+        self._source = source

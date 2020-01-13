@@ -1,5 +1,6 @@
 import os
 import hashlib
+import base64
 
 from untitled_project.database.facade import DatabaseFacade
 from untitled_project.sources.wikidata import WikidataSource
@@ -38,7 +39,7 @@ class QueryEngine:
                   name=place.name,
                   lat=place.latitude,
                   lon=place.longitude,
-                  wikidata_id=None)
+                  wikidata_id=place.wikidata_id)
         return models.place.Place(id=self._db.insert_place(p))
 
     def put_document(self, document: models.document.Document) -> models.document.Document:
@@ -47,24 +48,25 @@ class QueryEngine:
                      author=document.author,
                      year=document.year,
                      text=document.text,
-                     source=None)
+                     source=document.source)
         return models.document.Document(id=self._db.insert_document(d))
 
     def put_image(self, image: models.image.Image) -> models.image.Image:
         outfile = None
         if image.data:
-            digest = hashlib.sha256(image.data).hexdigest()
+            raw = base64.b64decode(image.data, validate=True)
+            digest = hashlib.sha256(raw).hexdigest()
             outdir = os.path.join(IMG_DIR, digest[:2])
             os.makedirs(outdir, exist_ok=True)
             outfile = os.path.join(outdir, digest)
             with open(outfile, 'wb') as f:
-                f.write(image.data)
+                f.write(raw)
         i = Image(id=None,
                   file=outfile,
                   mime=image.mime,
                   caption=image.caption,
-                  author=image.copy,
-                  source=None)
+                  author=image.author,
+                  source=image.source)
         return models.image.Image(id=self._db.insert_image(i))
 
     def create_place_document_link(self, pid, did, positon_in_text) -> bool:
@@ -78,8 +80,8 @@ class QueryEngine:
                   name=place.name,
                   lat=place.latitude,
                   lon=place.longitude,
-                  wikidata_id=None)
-        return models.place.Place(id=self._db.insert_place(p, ['p_lat', 'p_lon', 'p_name']))
+                  wikidata_id=place.wikidata_id)
+        return models.place.Place(id=self._db.update_place(p))
 
     def patch_document(self, id_: int, document: models.document.Document) -> models.document.Document:
         d = Document(id=id_,
@@ -87,8 +89,8 @@ class QueryEngine:
                      author=document.author,
                      year=document.year,
                      text=document.text,
-                     source=None)
-        return models.document.Document(id=self._db.insert_document(d, ['d_title', 'd_author', 'd_year', 'd_text']))
+                     source=document.source)
+        return models.document.Document(id=self._db.update_document(d))
 
     def patch_image(self, id_: int, image: models.image.Image) -> models.image.Image:
         outfile = None
@@ -97,15 +99,16 @@ class QueryEngine:
             outdir = os.path.join(IMG_DIR, digest[:2])
             os.makedirs(outdir, exist_ok=True)
             outfile = os.path.join(outdir, digest)
+            raw = base64.b64decode(image.data, validate=True)
             with open(outfile, 'wb') as f:
-                f.write(image.data)
+                f.write(raw)
         i = Image(id=id_,
                   file=outfile if outfile else None,
                   mime=image.mime,
                   caption=image.caption,
-                  author=image.copy,
-                  source=None)
-        return models.image.Image(id=self._db.insert_image(i))
+                  author=image.author,
+                  source=image.source)
+        return models.image.Image(id=self._db.update_image(i))
 
     def delete_place(self, id_) -> None:
         self._db.delete_place(id_)
@@ -166,6 +169,7 @@ class QueryEngine:
             wikidata_images = self._wikidata.query_images_for_place(place)
             for img in wikidata_images:
                 images.append(img)
+        print(place)
         return images
 
 

@@ -20,8 +20,8 @@ setup(
         'bottle',
         'mysql-connector-python',
         'lxml',
-        'six',
-        'connexion'
+        'connexion',
+        'connexion[swagger-ui]'
     ],
     entry_points={
         'console_scripts': [

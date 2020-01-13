@@ -8,6 +8,8 @@ paths:
 
   /ping:
     get:
+      tags:
+        - Server
       parameters: []
       responses:
         "204":
@@ -16,6 +18,8 @@ paths:
 
   /places/search/location:
     get:
+      tags:
+        - Search
       parameters:
         - name: latitude
           in: query
@@ -56,6 +60,8 @@ paths:
 
   /places/search/name:
     get:
+      tags:
+        - Search
       parameters:
         - name: name
           in: query
@@ -74,6 +80,8 @@ paths:
 
   /place:
     put:
+      tags:
+        - Places
       summary: Add a new place
       security:
         - TokenAuth: []
@@ -106,6 +114,8 @@ paths:
 
   /place/{id}:
     get:
+      tags:
+        - Places
       summary: Fetch the place identified by the ID in the path.
       parameters:
         - name: id
@@ -129,6 +139,8 @@ paths:
                 $ref: "#/components/schemas/Error"
 
     patch:
+      tags:
+        - Places
       summary: Update the place identified by the ID in the path.
       security:
         - TokenAuth: []
@@ -168,6 +180,8 @@ paths:
                 $ref: "#/components/schemas/Error"
 
     delete:
+      tags:
+        - Places
       summary: Delete the place identified by the ID in the path.
       security:
         - TokenAuth: []
@@ -197,6 +211,8 @@ paths:
 
   /place/{id}/documents:
     get:
+      tags:
+        - Links
       summary: Find documents related to the place indicated by the ID in the path.
       parameters:
         - name: id
@@ -221,6 +237,8 @@ paths:
 
   /place/{pid}/document/{did}:
     get:
+      tags:
+        - Links
       summary: Get the links between a place identified by pid and a document indicated by did.
       parameters:
         - name: pid
@@ -243,6 +261,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/ArrayOfIntegers"
     put:
+      tags:
+        - Links
       summary: Add a link between a place identified by pid and a document indicated by did.
       security:
         - TokenAuth: []
@@ -281,6 +301,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
     delete:
+      tags:
+        - Links
       summary: Delete a link between a place identified by pid and a document indicated by did.
       security:
         - TokenAuth: []
@@ -323,6 +345,8 @@ paths:
 
   /place/{id}/images:
     get:
+      tags:
+        - Links
       summary: Find images related to the place indicated by the ID in the path.
       parameters:
         - name: id
@@ -348,6 +372,8 @@ paths:
 
   /place/{pid}/image/{iid}:
     get:
+      tags:
+        - Links
       summary: Get the link between a place identified by pid and an image indicated by iid.
       parameters:
         - name: pid
@@ -372,6 +398,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
     put:
+      tags:
+        - Links
       summary: Add a link between a place identified by pid and an image indicated by iid.
       security:
         - TokenAuth: []
@@ -404,6 +432,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
     delete:
+      tags:
+        - Links
       summary: Delete a link between a place identified by pid and an image indicated by iid.
       security:
         - TokenAuth: []
@@ -440,6 +470,8 @@ paths:
 
   /document:
     put:
+      tags:
+        - Documents
       summary: Add a new document
       security:
         - TokenAuth: []
@@ -473,6 +505,8 @@ paths:
 
   /document/{id}:
     get:
+      tags:
+        - Documents
       summary: Fetch the document identified by the ID in the path.
       parameters:
         - name: id
@@ -496,6 +530,8 @@ paths:
                 $ref: "#/components/schemas/Error"
 
     patch:
+      tags:
+        - Documents
       summary: Update the document identified by the ID in the path.
       security:
         - TokenAuth: []
@@ -535,6 +571,8 @@ paths:
                 $ref: "#/components/schemas/Error"
 
     delete:
+      tags:
+        - Documents
       summary: Delete the document identified by the ID in the path.
       security:
         - TokenAuth: []
@@ -565,6 +603,8 @@ paths:
 
   /image:
     put:
+      tags:
+        - Images
       summary: Add a new image
       security:
         - TokenAuth: []
@@ -598,6 +638,8 @@ paths:
 
   /image/{id}:
     get:
+      tags:
+        - Images
       summary: Fetch the image identified by the ID in the path.
       parameters:
         - name: id
@@ -621,6 +663,8 @@ paths:
                 $ref: "#/components/schemas/Error"
 
     patch:
+      tags:
+        - Images
       summary: Update the image identified by the ID in the path.
       security:
         - TokenAuth: []
@@ -660,6 +704,8 @@ paths:
                 $ref: "#/components/schemas/Error"
 
     delete:
+      tags:
+        - Images
       summary: Delete the image identified by the ID in the path.
       security:
         - TokenAuth: []
@@ -686,8 +732,10 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-/image/{id}/image:
+  /image/{id}/image:
     get:
+      tags:
+        - Images
       summary: Fetch the image file belonging to the image object identified by the ID in the path.
       parameters:
         - name: id
@@ -711,6 +759,20 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
+
+tags:
+  - name: Server
+    description: Server-related API paths
+  - name: Places
+    description: API paths related to place objects
+  - name: Documents
+    description: API paths related to document objects
+  - name: Images
+    description: API paths related to image objects
+  - name: Links
+    descrption: API paths related to links between objects
+  - name: Search
+    description: API paths related to the search of objects
 
 
 components:
@@ -740,6 +802,8 @@ components:
           type: number
         longitude:
           type: number
+        wikidata_id:
+          type: string
 
     Document:
       type: object
@@ -753,6 +817,8 @@ components:
         year:
           type: integer
         author:
+          type: string
+        source:
           type: string
 
     Image:
@@ -769,7 +835,9 @@ components:
           type: string
         caption:
           type: string
-        copy:
+        author:
+          type: string
+        source:
           type: string
 
     ArrayOfPlaces:

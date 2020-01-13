@@ -14,7 +14,7 @@ class Image(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: int=None, data: str=None, url: str=None, mime: str=None, caption: str=None, copy: str=None):  # noqa: E501
+    def __init__(self, id: int=None, data: str=None, url: str=None, mime: str=None, caption: str=None, author: str=None, source: str=None):  # noqa: E501
         """Image - a model defined in Swagger
 
         :param id: The id of this Image.  # noqa: E501
@@ -27,8 +27,10 @@ class Image(Model):
         :type mime: str
         :param caption: The caption of this Image.  # noqa: E501
         :type caption: str
-        :param copy: The copy of this Image.  # noqa: E501
-        :type copy: str
+        :param author: The author of this Image.  # noqa: E501
+        :type author: str
+        :param source: The source of this Image.  # noqa: E501
+        :type source: str
         """
         self.swagger_types = {
             'id': int,
@@ -36,7 +38,8 @@ class Image(Model):
             'url': str,
             'mime': str,
             'caption': str,
-            'copy': str
+            'author': str,
+            'source': str
         }
 
         self.attribute_map = {
@@ -45,14 +48,16 @@ class Image(Model):
             'url': 'url',
             'mime': 'mime',
             'caption': 'caption',
-            'copy': 'copy'
+            'author': 'author',
+            'source': 'source'
         }
         self._id = id
         self._data = data
         self._url = url
         self._mime = mime
         self._caption = caption
-        self._copy = copy
+        self._author = author
+        self._source = source
 
     @classmethod
     def from_dict(cls, dikt) -> 'Image':
@@ -171,22 +176,43 @@ class Image(Model):
         self._caption = caption
 
     @property
-    def copy(self) -> str:
-        """Gets the copy of this Image.
+    def author(self) -> str:
+        """Gets the author of this Image.
 
 
-        :return: The copy of this Image.
+        :return: The author of this Image.
         :rtype: str
         """
-        return self._copy
+        return self._author
 
-    @copy.setter
-    def copy(self, copy: str):
-        """Sets the copy of this Image.
+    @author.setter
+    def author(self, author: str):
+        """Sets the author of this Image.
 
 
-        :param copy: The copy of this Image.
-        :type copy: str
+        :param author: The author of this Image.
+        :type author: str
         """
 
-        self._copy = copy
+        self._author = author
+
+    @property
+    def source(self) -> str:
+        """Gets the source of this Image.
+
+
+        :return: The source of this Image.
+        :rtype: str
+        """
+        return self._source
+
+    @source.setter
+    def source(self, source: str):
+        """Sets the source of this Image.
+
+
+        :param source: The source of this Image.
+        :type source: str
+        """
+
+        self._source = source

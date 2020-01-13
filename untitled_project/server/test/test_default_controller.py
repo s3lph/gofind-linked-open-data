@@ -91,6 +91,17 @@ class TestDefaultController(BaseTestCase):
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
+    def test_image_id_image_get(self):
+        """Test case for image_id_image_get
+
+        Fetch the image file belonging to the image object identified by the ID in the path.
+        """
+        response = self.client.open(
+            '/image/{id}/image'.format(id=56),
+            method='GET')
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
     def test_image_id_patch(self):
         """Test case for image_id_patch
 

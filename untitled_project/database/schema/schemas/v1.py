@@ -49,9 +49,7 @@ class SchemaV1(BaseSchema):
                 i_mime VARCHAR(512) NOT NULL,
                 i_author VARCHAR(300) DEFAULT NULL,
                 i_caption VARCHAR(512) DEFAULT NULL,
-                i_source VARCHAR(512) DEFAULT NULL,
-                FOREIGN KEY (p_id) REFERENCES places(p_id)
-                    ON UPDATE CASCADE ON DELETE SET NULL 
+                i_source VARCHAR(512) DEFAULT NULL
             );
             """, """
             CREATE TABLE images_places (

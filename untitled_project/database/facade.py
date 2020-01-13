@@ -78,6 +78,33 @@ class DatabaseFacade:
                 insert_id = -1
         return insert_id
 
+    def update_place(self, place: Place):
+        if not place.id:
+            raise ValueError('Place ID missing')
+        kvpairs = []
+        values = []
+        if place.lat:
+            kvpairs.append('p_lat = %s')
+            values.append(place.lat)
+        if place.lon:
+            kvpairs.append('p_lon = %s')
+            values.append(place.lon)
+        if place.name:
+            kvpairs.append('p_name = %s')
+            values.append(place.name)
+        if place.wikidata_id:
+            kvpairs.append('p_wikidata = %s')
+            values.append(place.wikidata_id)
+        if len(kvpairs) == 0:
+            raise ValueError('Nothing to update')
+        values.append(place.id)
+        query = f' UPDATE places SET {", ".join(kvpairs)} WHERE p_id = %s'
+        with self._db.transaction() as c:
+            c.execute(query, tuple(values))
+            if c.rowcount == 0:
+                raise ValueError('ID does not exist')
+            return place.id
+
     def insert_document(self, document: Document, upsert_fields=None):
         upsert_fields = upsert_fields or []
         columns = []
@@ -150,6 +177,36 @@ class DatabaseFacade:
                 insert_id = -1
         return insert_id
 
+    def update_document(self, document: Document):
+        if not document.id:
+            raise ValueError('Document ID missing')
+        kvpairs = []
+        values = []
+        if document.title:
+            kvpairs.append('d_title = %s')
+            values.append(document.title)
+        if document.author:
+            kvpairs.append('d_author = %s')
+            values.append(document.author)
+        if document.year:
+            kvpairs.append('d_year = %s')
+            values.append(document.year)
+        if document.text:
+            kvpairs.append('d_text = %s')
+            values.append(document.text)
+        if document.source:
+            kvpairs.append('d_source = %s')
+            values.append(document.source)
+        if len(kvpairs) == 0:
+            raise ValueError('Nothing to update')
+        values.append(document.id)
+        query = f' UPDATE documents SET {", ".join(kvpairs)} WHERE d_id = %s'
+        with self._db.transaction() as c:
+            c.execute(query, tuple(values))
+            if c.rowcount == 0:
+                raise ValueError('ID does not exist')
+            return document.id
+
     def insert_image(self, image: Image, upsert_fields=None):
         upsert_fields = upsert_fields or []
         columns = []
@@ -174,7 +231,7 @@ class DatabaseFacade:
             vcolumns.append('%s')
             values.append(image.caption)
         if image.author is not None:
-            columns.append('i_copy')
+            columns.append('i_author')
             vcolumns.append('%s')
             values.append(image.author)
         if image.source is not None:
@@ -221,6 +278,33 @@ class DatabaseFacade:
             else:
                 insert_id = -1
         return insert_id
+
+    def update_image(self, image: Image):
+        if not image.id:
+            raise ValueError('Image ID missing')
+        kvpairs = []
+        values = []
+        if image.mime:
+            kvpairs.append('i_mime = %s')
+            values.append(image.mime)
+        if image.caption:
+            kvpairs.append('i_caption = %s')
+            values.append(image.caption)
+        if image.author:
+            kvpairs.append('i_author = %s')
+            values.append(image.author)
+        if image.source:
+            kvpairs.append('i_source = %s')
+            values.append(image.source)
+        if len(kvpairs) == 0:
+            raise ValueError('Nothing to update')
+        values.append(image.id)
+        query = f' UPDATE images SET {", ".join(kvpairs)} WHERE i_id = %s'
+        with self._db.transaction() as c:
+            c.execute(query, tuple(values))
+            if c.rowcount == 0:
+                raise ValueError('ID does not exist')
+            return image.id
 
     def link_place_document(self, place: Place, document: Document, position_in_text: int):
         if place.id is None or document.id is None:
@@ -290,7 +374,7 @@ class DatabaseFacade:
             c.execute(query, (place.id,))
             for row in c.fetchall():
                 d_id, d_title, d_text, d_author, d_year, d_source = row
-                document = Document(d_id, d_title, d_text, d_author, d_year, d_source)
+                document = Document(d_id, d_title, d_author, d_year, d_text, d_source)
                 results.append(document)
         return results
 
@@ -339,15 +423,15 @@ class DatabaseFacade:
 
     def fetch_image(self, id_) -> Optional[Image]:
         query = '''
-        SELECT i_id, i_filepath, i_mime, i_author, i_year, i_source
+        SELECT i_id, i_filepath, i_mime, i_author, i_caption, i_source
         FROM images
         WHERE i_id = %s
         '''
         with self._db.transaction() as c:
             c.execute(query, (id_,))
             for row in c.fetchall():
-                i_id, i_filepath, i_mime, i_author, i_year, i_source = row
-                return Image(id=i_id, file=i_filepath, mime=i_mime, caption=None, author=i_author, source=i_source)
+                i_id, i_filepath, i_mime, i_author, i_caption, i_source = row
+                return Image(id=i_id, file=i_filepath, mime=i_mime, caption=i_caption, author=i_author, source=i_source)
         return None
 
     def fetch_place_document_links(self, pid, did) -> List[int]:

@@ -2,6 +2,8 @@ import json
 import urllib.request
 import urllib.parse
 
+from untitled_project.types.document import Document
+from untitled_project.types.image import Image
 from untitled_project.types.place import Place
 
 WIKIDATA_API = 'https://query.wikidata.org/sparql?format=json'
@@ -259,7 +261,15 @@ class WikidataSource:
             page = url.split('/')[-1]
             wikipedia_url = WIKIPEDIA_ARTICLE_API.format(title=page)
             response = self.__query_wikipedia(wikipedia_url)
-            documents.append(response)
+            for article in response:
+                article_url = f'https://de.wikipedia.org/wiki/{urllib.parse.quote(article["title"])}'
+                doc = Document(id=None,
+                               title=article['title'],
+                               author=None,
+                               year=None,
+                               text=article['extract'],
+                               source=article_url)
+                documents.append(doc)
         return documents
 
     def query_images_for_place(self, place):

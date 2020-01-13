@@ -14,7 +14,7 @@ class Place(Model):
 
     Do not edit the class manually.
     """
-    def __init__(self, id: int=None, name: str=None, latitude: float=None, longitude: float=None):  # noqa: E501
+    def __init__(self, id: int=None, name: str=None, latitude: float=None, longitude: float=None, wikidata_id: str=None):  # noqa: E501
         """Place - a model defined in Swagger
 
         :param id: The id of this Place.  # noqa: E501
@@ -25,24 +25,29 @@ class Place(Model):
         :type latitude: float
         :param longitude: The longitude of this Place.  # noqa: E501
         :type longitude: float
+        :param wikidata_id: The wikidata_id of this Place.  # noqa: E501
+        :type wikidata_id: str
         """
         self.swagger_types = {
             'id': int,
             'name': str,
             'latitude': float,
-            'longitude': float
+            'longitude': float,
+            'wikidata_id': str
         }
 
         self.attribute_map = {
             'id': 'id',
             'name': 'name',
             'latitude': 'latitude',
-            'longitude': 'longitude'
+            'longitude': 'longitude',
+            'wikidata_id': 'wikidata_id'
         }
         self._id = id
         self._name = name
         self._latitude = latitude
         self._longitude = longitude
+        self._wikidata_id = wikidata_id
 
     @classmethod
     def from_dict(cls, dikt) -> 'Place':
@@ -138,3 +143,24 @@ class Place(Model):
         """
 
         self._longitude = longitude
+
+    @property
+    def wikidata_id(self) -> str:
+        """Gets the wikidata_id of this Place.
+
+
+        :return: The wikidata_id of this Place.
+        :rtype: str
+        """
+        return self._wikidata_id
+
+    @wikidata_id.setter
+    def wikidata_id(self, wikidata_id: str):
+        """Sets the wikidata_id of this Place.
+
+
+        :param wikidata_id: The wikidata_id of this Place.
+        :type wikidata_id: str
+        """
+
+        self._wikidata_id = wikidata_id
