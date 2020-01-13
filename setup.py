@@ -17,7 +17,6 @@ setup(
     long_description='',
     python_requires='>=3.6',
     install_requires=[
-        'bottle',
         'mysql-connector-python',
         'lxml',
         'connexion',

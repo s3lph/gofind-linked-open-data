@@ -1,5 +1,8 @@
 import connexion
 import six
+import os
+
+from connexion.lifecycle import ConnexionResponse
 
 from untitled_project.engine import QueryEngine
 from untitled_project.server.models.error import Error  # noqa: E501
@@ -61,7 +64,14 @@ def image_id_image_get(id_):  # noqa: E501
         return Error('404', f'Image file not found'), 404
     except PermissionError:
         return Error('404', f'Permission denied'), 403
-    return data, 200, {'Content-Type': i.mime}
+    response = ConnexionResponse(
+        status_code=200,
+        mimetype=i.mime,
+        content_type=f'{i.mime}; charset=binary',
+        body=data,
+        headers={}
+    )
+    return response
 
 
 def image_id_patch(body, id_):  # noqa: E501

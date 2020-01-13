@@ -134,7 +134,7 @@ def place_pid_image_iid_get(pid, iid):  # noqa: E501
     result = engine.get_place_image_link(pid, iid)
     if result:
         return None, 204
-    return Error('404', f'Place {pid}, image {iid} not found'), 404
+    return Error('404', f'Link between place {pid} and image {iid} not found'), 404
 
 
 def place_pid_image_iid_put(pid, iid):  # noqa: E501
