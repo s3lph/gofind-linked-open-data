@@ -37,8 +37,8 @@ class QueryEngine:
     def put_place(self, place: models.place.Place) -> models.place.Place:
         p = Place(id=None,
                   name=place.name,
-                  lat=place.latitude,
-                  lon=place.longitude,
+                  latitude=place.latitude,
+                  longitude=place.longitude,
                   wikidata_id=place.wikidata_id)
         return models.place.Place(id=self._db.insert_place(p))
 
@@ -78,8 +78,8 @@ class QueryEngine:
     def patch_place(self, id_: int, place: models.place.Place) -> models.place.Place:
         p = Place(id=id_,
                   name=place.name,
-                  lat=place.latitude,
-                  lon=place.longitude,
+                  latitude=place.latitude,
+                  longitude=place.longitude,
                   wikidata_id=place.wikidata_id)
         return models.place.Place(id=self._db.update_place(p))
 

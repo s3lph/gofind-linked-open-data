@@ -3,10 +3,12 @@ import sys
 import hashlib
 import pickle
 import time
+import json
 
 import urllib.request
 import lxml.html
 
+from untitled_project.engine import QueryEngine
 from untitled_project.types.document import Document
 from untitled_project.types.image import Image
 from untitled_project.types.place import Place
@@ -202,15 +204,17 @@ def parse():
     for fname in os.listdir(RAW_OUT_DIR):
         fullname = os.path.join(RAW_OUT_DIR, fname)
         place = obj_parse(fullname)
-        if place.lat is None or place.lon is None:
+        if place.latitude is None or place.longitude is None:
             continue
         document = obj_parse_doc(fullname)
-        # images = obj_parse_images(fullname)
+        images = obj_parse_images(fullname)
         place.id = db.insert_place(place, upsert_fields=['p_title', 'p_lat', 'p_lon', 'p_wikidata'])
         document.id = db.insert_document(document, upsert_fields=['d_title', 'd_author', 'd_text', 'd_source'])
         db.link_place_document(place, document, 0)
-        # for image in images:
-        #     db.insert_image(image)
+        for image in images:
+            image.id = db.insert_image(image,
+                                       upsert_fields=['i_filepath', 'i_mime', 'i_caption', 'i_author', 'i_source'])
+            db.insert_place_image_link(place.id, image.id)
 
 
 if __name__ == '__main__':

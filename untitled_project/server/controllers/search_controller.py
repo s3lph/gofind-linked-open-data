@@ -26,7 +26,7 @@ def places_search_location_get(latitude, longitude, radius=None, limit=None):  #
     engine = QueryEngine()
     location = (latitude, longitude)
     results = engine.query_location(location, radius, limit)
-    return [Place(id=p.id, name=p.name, latitude=p.lat, longitude=p.lon, wikidata_id=p.wikidata_id)
+    return [Place(id=p.id, name=p.name, latitude=p.latitude, longitude=p.longitude, wikidata_id=p.wikidata_id)
             for p, dist in results]
 
 
@@ -42,4 +42,5 @@ def places_search_name_get(name):  # noqa: E501
     """
     engine = QueryEngine()
     results = engine.query_name(name)
-    return [Place(id=p.id, name=p.name, latitude=p.lat, longitude=p.lon, wikidata_id=p.wikidata_id) for p in results]
+    return [Place(id=p.id, name=p.name, latitude=p.latitude, longitude=p.longitude, wikidata_id=p.wikidata_id)
+            for p in results]

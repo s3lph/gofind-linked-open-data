@@ -36,7 +36,7 @@ def place_id_get(id_):  # noqa: E501
     p = engine.query_place(id_)
     if not p:
         return Error('404', f'Place {id_} not found'), 404
-    return Place(id=p.id, name=p.name, latitude=p.lat, longitude=p.lon, wikidata_id=p.wikidata_id)
+    return Place(id=p.id, name=p.name, latitude=p.latitude, longitude=p.longitude, wikidata_id=p.wikidata_id)
 
 
 def place_id_patch(body, id_):  # noqa: E501

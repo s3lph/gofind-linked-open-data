@@ -41,7 +41,15 @@ def place_id_images_get(id_):  # noqa: E501
     engine = QueryEngine()
     place = engine.query_place(id_)
     result = engine.query_images_for_place(place)
-    return [Image(id=i.id, data=None, mime=i.mime, caption=i.caption, author=i.author, source=i.source) for i in result]
+    results = []
+    for r in result:
+        if isinstance(r, str):
+            i = Image(url=r)
+        else:
+            url = connexion.request.base_url.replace(f'/place/{id_}/images', f'/image/{r.id}/image')
+            i = Image(id=r.id, url=url, mime=r.mime, caption=r.caption, author=r.author, source=r.source)
+        results.append(i)
+    return results
 
 
 def place_pid_document_did_delete(pid, did, position_in_text):  # noqa: E501

@@ -24,14 +24,14 @@ class DatabaseFacade:
             columns.append('p_id')
             vcolumns.append('%s')
             values.append(place.id)
-        if place.lat is not None:
+        if place.latitude is not None:
             columns.append('p_lat')
             vcolumns.append('%s')
-            values.append(place.lat)
-        if place.lon is not None:
+            values.append(place.latitude)
+        if place.longitude is not None:
             columns.append('p_lon')
             vcolumns.append('%s')
-            values.append(place.lon)
+            values.append(place.longitude)
         if place.name is not None:
             columns.append('p_name')
             vcolumns.append('%s')
@@ -46,12 +46,12 @@ class DatabaseFacade:
         if place.id is not None and 'p_id' in upsert_fields:
             upsert_columns.append('p_id = %s')
             values.append(place.id)
-        if place.lat is not None and 'p_lat' in upsert_fields:
+        if place.latitude is not None and 'p_lat' in upsert_fields:
             upsert_columns.append('p_lat = %s')
-            values.append(place.lat)
-        if place.lon is not None and 'p_lon' in upsert_fields:
+            values.append(place.latitude)
+        if place.longitude is not None and 'p_lon' in upsert_fields:
             upsert_columns.append('p_lon = %s')
-            values.append(place.lon)
+            values.append(place.longitude)
         if place.name is not None and 'p_name' in upsert_fields:
             upsert_columns.append('p_name = %s')
             values.append(place.name)
@@ -83,12 +83,12 @@ class DatabaseFacade:
             raise ValueError('Place ID missing')
         kvpairs = []
         values = []
-        if place.lat:
+        if place.latitude:
             kvpairs.append('p_lat = %s')
-            values.append(place.lat)
-        if place.lon:
+            values.append(place.latitude)
+        if place.longitude:
             kvpairs.append('p_lon = %s')
-            values.append(place.lon)
+            values.append(place.longitude)
         if place.name:
             kvpairs.append('p_name = %s')
             values.append(place.name)
@@ -405,7 +405,7 @@ class DatabaseFacade:
             c.execute(query, (id_,))
             for row in c.fetchall():
                 p_id, p_name, p_wikidata, p_lat, p_lon = row
-                return Place(id=p_id, name=p_name, lat=p_lat, lon=p_lon, wikidata_id=p_wikidata)
+                return Place(id=p_id, name=p_name, latitude=p_lat, longitude=p_lon, wikidata_id=p_wikidata)
         return None
 
     def fetch_document(self, id_) -> Optional[Document]:

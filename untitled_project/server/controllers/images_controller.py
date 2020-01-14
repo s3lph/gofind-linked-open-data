@@ -10,6 +10,9 @@ from untitled_project.server.models.image import Image  # noqa: E501
 from untitled_project.server import util
 
 
+IMG_DIR = '../scraper/basler_bauten'
+
+
 def image_id_delete(id_):  # noqa: E501
     """Delete the image identified by the ID in the path.
 
@@ -58,7 +61,8 @@ def image_id_image_get(id_):  # noqa: E501
     if not i:
         return Error('404', f'Image {id_} not found'), 404
     try:
-        with open(i.file, 'rb') as f:
+        fname = os.path.join(IMG_DIR, i.file)
+        with open(fname, 'rb') as f:
             data = f.read()
     except FileNotFoundError:
         return Error('404', f'Image file not found'), 404

@@ -7,6 +7,6 @@ import dataclasses
 class Place:
     id: Optional[int]
     name: Optional[str]
-    lat: Optional[float]
-    lon: Optional[float]
+    latitude: Optional[float]
+    longitude: Optional[float]
     wikidata_id: Optional[str]
